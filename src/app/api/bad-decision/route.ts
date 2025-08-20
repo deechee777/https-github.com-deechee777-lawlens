@@ -13,7 +13,8 @@ function generateShareSlug(): string {
   return result;
 }
 
-const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+// Initialize OpenAI client only when needed
+let client: OpenAI | null = null;
 
 function getClientInfo(request: NextRequest) {
   const forwarded = request.headers.get('x-forwarded-for');
@@ -52,6 +53,11 @@ export async function POST(request: NextRequest) {
       riskScore = mockResult.risk_score;
       explanation = mockResult.message;
     } else {
+      // Initialize OpenAI client if not already done
+      if (!client) {
+        client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+      }
+      
       // Real OpenAI API call
       const prompt = `
   Rate the following decision on financial, legal, social, and practical risk (0-10 each).
