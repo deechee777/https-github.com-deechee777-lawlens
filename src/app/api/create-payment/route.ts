@@ -1,13 +1,22 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase';
-import Stripe from 'stripe';
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: '2024-11-20.acacia',
-});
+// Stripe client will be dynamically imported when needed
+let Stripe: any = null;
+let stripe: any = null;
 
 export async function POST(request: NextRequest) {
   try {
+    // Initialize Stripe client if not already done
+    if (!stripe) {
+      if (!Stripe) {
+        Stripe = (await import('stripe')).default;
+      }
+      stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
+        apiVersion: '2024-11-20.acacia',
+      });
+    }
+
     const { email, question } = await request.json();
 
     if (!email || !question) {
