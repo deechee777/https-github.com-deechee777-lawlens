@@ -111,4 +111,4 @@ The search system uses a multi-strategy approach:
 
 ### Search API Endpoints
 - `GET /api/search?q=query` - Single best match
-- `GET /api/search?q=query&multiple=true&limit=5` - Multiple results
+- `GET /api/search?q=query&multiple=true&limit=5` - Multiple results# Force deployment trigger
