@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase';
-import OpenAI from 'openai';
 import { isDemoMode, mockBadDecisionAnalysis } from '@/lib/demo-data';
 
 function generateShareSlug(): string {
@@ -13,8 +12,9 @@ function generateShareSlug(): string {
   return result;
 }
 
-// Initialize OpenAI client only when needed
-let client: OpenAI | null = null;
+// OpenAI client will be dynamically imported when needed
+let OpenAI: any = null;
+let client: any = null;
 
 function getClientInfo(request: NextRequest) {
   const forwarded = request.headers.get('x-forwarded-for');
@@ -53,8 +53,11 @@ export async function POST(request: NextRequest) {
       riskScore = mockResult.risk_score;
       explanation = mockResult.message;
     } else {
-      // Initialize OpenAI client if not already done
+      // Dynamically import and initialize OpenAI client if not already done
       if (!client) {
+        if (!OpenAI) {
+          OpenAI = (await import('openai')).default;
+        }
         client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
       }
       
